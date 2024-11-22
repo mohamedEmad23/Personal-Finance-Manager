@@ -1,0 +1,11 @@
+from sqlalchemy import Column, Integer, String, BIGINT, Boolean
+from ..core.database import Base
+
+
+class User(Base):
+    __table__name = "Users"
+
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String(50), unique=True, not_null=True, index=True)
+
+

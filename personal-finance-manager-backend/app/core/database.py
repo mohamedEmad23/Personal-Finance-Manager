@@ -1,12 +1,25 @@
 from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from .config import get_settings
 
-SQLALCHEMY_DATABASE_URL = "mysql://root:123Main_Connection123@localhost/finance_manager_sp"
+settings = get_settings()
 
-engine = create_engine(SQLALCHEMY_DATABASE_URL)
+engine = create_engine(
+    settings.DATABASE_URL,
+    pool_pre_ping=True,
+    pool_size=5,
+    max_overflow=10,
+    pool_recycle=3600,
+)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-# autocommit=False: Disables automatic commit of transactions. This allows you to group multiple operations into a single transaction and commit them together.
-# autoflush=False: Disables automatic flushing of changes to the database. This means that changes to objects will not be immediately written to the database until you explicitly call the session.flush() or session.commit() methods.
 Base = declarative_base()
+
+
+def get_db() -> Session:
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

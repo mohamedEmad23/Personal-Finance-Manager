@@ -6,7 +6,7 @@ from .config import get_settings
 settings = get_settings()
 
 engine = create_engine(
-    settings.DATABASE_URL,
+    settings.MYSQL_URI,
     pool_pre_ping=True,
     pool_size=5,
     max_overflow=10,

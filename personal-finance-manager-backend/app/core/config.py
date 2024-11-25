@@ -1,20 +1,8 @@
-# import os
-# from pydantic import BaseSettings
-# from pydantic.v1 import BaseSettings
-#
-#
-#
-# class Settings(BaseSettings):
-#     DATABASE_URL: str = os.getenv("DATABASE_URL", "mysql://root:123Main_Connection123@localhost/finance_manager_sp")
-#     SECRET_KEY: str = os.getenv("SECRET_KEY", "your_secret_key")
-#     ALGORITHM: str = "HS256"
-#     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
-#
-#
-# settings = Settings()
-from pydantic import BaseSettings
+from pydantic_settings import BaseSettings
 from typing import Optional
 from functools import lru_cache
+from pydantic import validator, ValidationError
+import re
 
 
 class Settings(BaseSettings):
@@ -28,7 +16,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # Database
-    DATABASE_URL: str
+    MYSQL_URI: str
 
     # CORS
     BACKEND_CORS_ORIGINS: list[str] = ["*"]
@@ -41,6 +29,15 @@ class Settings(BaseSettings):
     SMTP_PASSWORD: Optional[str] = None
     EMAILS_FROM_EMAIL: Optional[str] = None
     EMAILS_FROM_NAME: Optional[str] = None
+
+    @validator("MYSQL_URI")
+    def validate_mysql_uri(cls, v):
+        pattern = re.compile(
+            r"mysql://(?P<user>[^:]+):(?P<password>[^@]+)@(?P<host>[^:/]+)(?::(?P<port>\d+))?/(?P<database>[^?]+)"
+        )
+        if not pattern.match(v):
+            raise ValidationError("Invalid MYSQL_URI format")
+        return v
 
     class Config:
         env_file = ".env"

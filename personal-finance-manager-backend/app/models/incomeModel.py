@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, String, Numeric, DateTime, ForeignKey, Enum
 from sqlalchemy.sql import func
-from app.database import Base
+from app.core.database import Base
 from app.schemas.incomeSchema import IncomeFrequency
+
 
 class Income(Base):
     __tablename__ = "incomes"

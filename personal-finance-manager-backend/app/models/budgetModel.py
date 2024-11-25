@@ -1,7 +1,8 @@
 from sqlalchemy import Column, Integer, Numeric, DateTime, ForeignKey, Enum
 from sqlalchemy.sql import func
-from app.database import Base
+from app.core.database import Base
 from app.schemas.expenseSchema import ExpenseCategory
+
 
 class Budget(Base):
     __tablename__ = "budgets"

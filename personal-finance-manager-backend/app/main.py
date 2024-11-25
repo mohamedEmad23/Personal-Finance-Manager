@@ -1,12 +1,15 @@
 from fastapi import FastAPI, Depends, HTTPException
-from sqlalchemy.orm import Session
+from app.api.users import router as users_router
 from .core.database import SessionLocal, Base, engine
 from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
 
 # Create the database tables
 Base.metadata.create_all(bind=engine)
+
+app.include_router(users_router)
 
 
 def cors_middleware_factory(app: FastAPI) -> CORSMiddleware:
@@ -19,15 +22,6 @@ def cors_middleware_factory(app: FastAPI) -> CORSMiddleware:
     )
 
 
-# Dependency to get the database session
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 @app.get("/")
 async def root():
     return {"message": "Welcome to your personal financial tracker"}
@@ -36,3 +30,4 @@ async def root():
 @app.get("/hello/{name}")
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
+

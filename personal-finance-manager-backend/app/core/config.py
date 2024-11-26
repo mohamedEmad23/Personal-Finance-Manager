@@ -4,7 +4,6 @@ from functools import lru_cache
 from pydantic import validator, ValidationError
 import re
 
-
 class Settings(BaseSettings):
     # API Settings
     API_V1_STR: str = "/api"
@@ -16,7 +15,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
 
     # Database
-    MYSQL_URI: str
+    MONGO_URI: str  # Replace MySQL URI with MongoDB URI
 
     # CORS
     BACKEND_CORS_ORIGINS: list[str] = ["*"]
@@ -30,19 +29,9 @@ class Settings(BaseSettings):
     EMAILS_FROM_EMAIL: Optional[str] = None
     EMAILS_FROM_NAME: Optional[str] = None
 
-    @validator("MYSQL_URI")
-    def validate_mysql_uri(cls, v):
-        pattern = re.compile(
-            r"mysql://(?P<user>[^:]+):(?P<password>[^@]+)@(?P<host>[^:/]+)(?::(?P<port>\d+))?/(?P<database>[^?]+)"
-        )
-        if not pattern.match(v):
-            raise ValidationError("Invalid MYSQL_URI format")
-        return v
-
     class Config:
         env_file = ".env"
         case_sensitive = True
-
 
 @lru_cache()
 def get_settings() -> Settings:

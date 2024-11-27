@@ -1,0 +1,18 @@
+OB#!/bin/bash
+
+# Create the project directory structure
+mkdir -p "Personal Finance Tracker"/backend/app/{api,core,models,schemas,services,utils}
+mkdir -p "Personal Finance Tracker"/backend/tests
+
+# Create the necessary files
+touch "Personal Finance Tracker"/backend/app/{__init__.py,main.py}
+touch "Personal Finance Tracker"/backend/app/api/{__init__.py,auth.py,users.py,income.py,expenses.py,budgets.py,reports.py}
+touch "Personal Finance Tracker"/backend/app/core/{__init__.py,config.py,security.py,recommendations.py}
+touch "Personal Finance Tracker"/backend/app/models/{__init__.py,user.py,income.py,expense.py,budget.py}
+touch "Personal Finance Tracker"/backend/app/schemas/{__init__.py,user.py,income.py,expense.py,budget.py}
+touch "Personal Finance Tracker"/backend/app/services/{__init__.py,auth_service.py,income_service.py,expense_service.py,budget_service.py,recommendation_service.py}
+touch "Personal Finance Tracker"/backend/app/utils/{__init__.py,validators.py,helpers.py}
+touch "Personal Finance Tracker"/backend/tests/{__init__.py,test_auth.py,test_income.py,test_expenses.py,test_budgets.py}
+touch "Personal Finance Tracker"/backend/requirements.txt
+touch "Personal Finance Tracker"/backend/alembic.ini
+touch "Personal Finance Tracker"/README.md

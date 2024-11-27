@@ -24,6 +24,8 @@ def user_login(email: str, db: Session):
     return user
 
 
+# api
+
 # User Update
 def user_update(user_id: int, user: UserCreate, db: Session):
     db_user = db.query(userModel.User).filter(userModel.User.id == user_id).first()
@@ -43,3 +45,5 @@ def user_delete(user_id: int, db: Session):
     db.delete(db_user)
     db.commit()
     return db_user
+
+# User should be able to register on the website and create a new account

@@ -12,6 +12,7 @@ class UserCreate(UserBase):
     password: str
 
 
+# Validation for service user_login
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
@@ -31,3 +32,4 @@ class UserInDB(UserBase):
 
     class Config:
         from_attributes = True
+

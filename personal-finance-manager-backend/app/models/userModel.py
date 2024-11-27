@@ -1,7 +1,7 @@
 from pydantic import BaseModel, EmailStr
 from typing import Optional
 from datetime import datetime
-
+from app.core.database import db 
 # Pydantic model for user
 class UserBase(BaseModel):
     email: EmailStr
@@ -19,9 +19,6 @@ class UserInDB(UserBase):
 
     class Config:
         from_attributes = True
-
-# For MongoDB interaction, remove SQLAlchemy dependencies
-from app.core.database import db  # Assuming db is the Motor client instance
 
 # MongoDB-specific database operations
 async def create_user(user: UserCreate):

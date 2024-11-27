@@ -15,7 +15,7 @@ class ExpenseCategory(str, Enum):
 
 
 class ExpenseBase(BaseModel):
-    amount: condecimal(max_digits=10, decimal_places=2)
+    amount: condecimal(max_digits=10, decimal_places=2)  # type: ignore
     category: ExpenseCategory
     description: str
     date: datetime
@@ -26,7 +26,7 @@ class ExpenseCreate(ExpenseBase):
 
 
 class ExpenseUpdate(BaseModel):
-    amount: Optional[condecimal(max_digits=10, decimal_places=2)] = None
+    amount: Optional[condecimal(max_digits=10, decimal_places=2)] = None  # type: ignore
     category: Optional[ExpenseCategory] = None
     description: Optional[str] = None
     date: Optional[datetime] = None

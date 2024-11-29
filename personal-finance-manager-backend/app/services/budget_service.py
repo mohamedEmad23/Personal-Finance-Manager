@@ -63,3 +63,4 @@ def alert_user(budget_id: int, db: Session):
         print(f"Alert: Budget threshold exceeded for {db_budget.category}")
 
 
+    

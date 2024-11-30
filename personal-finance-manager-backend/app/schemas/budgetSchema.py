@@ -9,7 +9,6 @@ class BudgetBase(BaseModel):
     amount: condecimal(max_digits=10, decimal_places=2)
     start_date: datetime
     end_date: datetime
-    alert_threshold: condecimal(max_digits=3, decimal_places=2)  # Percentage
 
 
 class BudgetCreate(BudgetBase):
@@ -18,7 +17,6 @@ class BudgetCreate(BudgetBase):
 
 class BudgetUpdate(BaseModel):
     amount: Optional[condecimal(max_digits=10, decimal_places=2)] = None
-    alert_threshold: Optional[condecimal(max_digits=3, decimal_places=2)] = None
     end_date: Optional[datetime] = None
 
 

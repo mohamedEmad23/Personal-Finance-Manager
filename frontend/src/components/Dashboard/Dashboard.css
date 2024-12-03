@@ -1,0 +1,120 @@
+/* The main container for the dashboard */
+.dashboard-content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column; /* Ensure everything is stacked vertically */
+    gap: 20px; /* Adds space between sections */
+    margin-top: -10px;
+    margin-left: 250px;
+  }
+  
+  /* Styling for the 'Budgets' label and the buttons */
+  .budget-header {
+    display: flex;
+    justify-content: space-between; /* Ensures label and buttons are spread out */
+    align-items: center; /* Aligns label and buttons vertically */
+    margin-bottom: 20px; /* Adds space between the buttons and the cards */
+  }
+  
+  .budget-header h1 {
+    margin: 0; /* Remove default margin for the label */
+  }
+  
+  .budget-buttons {
+    display: flex;
+    gap: 10px; /* Adds space between buttons */
+  }
+  
+  /* Buttons styling */
+  .filter-button {
+    background-color: blue;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .create-button {
+    background-color: green;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .delete-button {
+    background-color: red;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  /* Styling for the budget cards */
+  .budget-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 16px;
+    margin-top: 20px;
+  }
+  
+/* Card container for styling */
+.budget-card {
+    background-color: #f9f9f9;
+    padding: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    position: relative; /* To position the dropdown */
+  }
+  
+  /* Three dots button styling */
+  .budget-card .menu-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: transparent;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    outline: none;
+  }
+  
+  /* Dropdown menu styling */
+  .dropdown-menu {
+    position: absolute;
+    top: 40px;
+    right: 10px;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    padding: 5px 0;
+    display: none; /* Initially hidden */
+    z-index: 1000;
+  }
+  
+  .dropdown-menu.show {
+    display: block; /* Show when active */
+  }
+  
+  .dropdown-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 16px;
+    background: none;
+    border: none;
+    text-align: left;
+    cursor: pointer;
+  }
+  
+  .dropdown-menu button:hover {
+    background-color: #f0f0f0;
+  }
+  
+
+  

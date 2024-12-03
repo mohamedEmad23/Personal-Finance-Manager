@@ -1,0 +1,116 @@
+.home-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 100vh;
+    padding: 0 5%;
+    background: url('../../../public/images/home.png') no-repeat center center;
+    background-size: cover;
+    font-family: Arial, sans-serif;
+    color: #ffffff; 
+}
+
+.description {
+    flex: 1;
+    max-width: 50%;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center; /* Center-align the text and icons */
+}
+
+.description h1 {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    color: #ffffff;
+}
+
+.description p {
+    font-size: 1.2rem;
+    margin: 10px 0;
+}
+
+.icons-container {
+    display: flex;
+    justify-content: center; /* Center-align icons horizontally */
+    margin-top: 20px; /* Add some space above the icons */
+}
+
+.icons-container .icon {
+    width: 48px; /* Adjust size as needed */
+    height: 48px;
+    margin: 0 10px; /* Add spacing between icons */
+    display: inline-block;
+}
+
+.actions {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    background: rgba(0, 0, 0, 0.6); 
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.actions button {
+    margin: 10px 0;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+.register-btn {
+    background-color: #4caf50;
+    color: white;
+}
+
+.register-btn:hover {
+    background-color: #45a049;
+}
+
+.login-btn {
+    background-color: #008cba;
+    color: white;
+}
+
+.login-btn:hover {
+    background-color: #007bb5;
+}
+
+.title-container {
+    position: absolute;
+    top: 3%;
+    width: 100%;
+    text-align: center;
+    z-index: 1;
+}
+
+.title {
+    font-size: 3rem;
+    color: #ffffff;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    animation: fadeIn 2s ease-out, floatUpOnce 2s ease-in-out forwards;
+}
+
+/* Fade-in animation for appearance */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Floating animation for moving up once */
+@keyframes floatUpOnce {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-40px);
+    }
+}

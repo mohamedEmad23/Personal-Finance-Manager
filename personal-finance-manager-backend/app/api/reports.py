@@ -70,13 +70,13 @@ def delete_existing_report(report_id: int, db: Session = Depends(get_db)):
 
 
 @report_router.get("/plot_income_expense/")
-def plot_income_expense_endpoint(user_id: int, start_date: datetime, end_date: datetime, db: Session = Depends(get_db)):
+def plot_income_expense(user_id: int, start_date: datetime, end_date: datetime, db: Session = Depends(get_db)):
     plot_income_expense(user_id, start_date, end_date, db)
     return {"message": "Plot generated successfully"}
 
 
 @report_router.get("/generate_transactions_file/")
-def generate_transactions_file_endpoint(user_id: int, year: int, file_format: str, db: Session = Depends(get_db)):
+def generate_transactions_file(user_id: int, year: int, file_format: str, db: Session = Depends(get_db)):
     if file_format not in ['csv', 'excel', 'pdf']:
         raise HTTPException(status_code=400, detail="Invalid file format")
     generate_transactions_file(user_id, year, file_format, db)

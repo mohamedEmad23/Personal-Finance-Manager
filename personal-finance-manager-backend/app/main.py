@@ -7,6 +7,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.auth import router as auth_router
 from app.api.expenses import expense_router
 from app.api.income import income_router
+import logging
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = FastAPI()
 
@@ -15,12 +19,12 @@ Base.metadata.create_all(bind=engine)
 
 
 # Include routers
-app.include_router(users_router, prefix="/api/v1/users", tags=["users"])
-app.include_router(auth_router, prefix="/api/v1/auth", tags=["auth"])
-app.include_router(expense_router, prefix="/api/v1/expenses", tags=["expenses"])
-app.include_router(income_router, prefix="/api/v1/income", tags=["income"])
-app.include_router(budget_router, prefix="/api/v1/budgets", tags=["budgets"])
-app.include_router(report_router, prefix="/api/v1/reports", tags=["reports"])
+app.include_router(users_router, tags=["users"])
+app.include_router(auth_router,  tags=["auth"])
+app.include_router(expense_router,  tags=["expenses"])
+app.include_router(income_router, tags=["income"])
+app.include_router(budget_router,  tags=["budgets"])
+app.include_router(report_router,  tags=["reports"])
 
 
 def cors_middleware_factory(app: FastAPI) -> CORSMiddleware:

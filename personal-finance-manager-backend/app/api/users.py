@@ -6,15 +6,27 @@ from ..schemas.userSchema import UserCreate, UserLogin, UserUpdate
 from app.services.user_service import create_user as create_user_service, user_login, user_update, user_delete
 from ..core.database import get_db
 from ..core.dependencies import db_dependency
-
+import logging
 from ..services.auth_service import authenticate_user
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
 
 @router.post("/users/", status_code=status.HTTP_201_CREATED)
 async def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    return create_user_service(user, db)
+    try:
+        logger.info("Processing data: %s", user)
+        db_user = create_user_service(user, db)
+        return {
+            "message": "User created successfully",
+            "user_id": db_user.id, }
+    except Exception as e:
+        logger.error("Error processing data: %s", e)
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR_BAD_REQUEST, detail=str(e))
 
 
 @router.put("/users/{user_id}/")

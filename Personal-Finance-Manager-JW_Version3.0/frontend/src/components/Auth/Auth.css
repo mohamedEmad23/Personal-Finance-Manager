@@ -1,0 +1,19 @@
+.login {
+    padding: 2rem;
+    text-align: center;
+}
+
+.login input {
+    display: block;
+    margin: 0.5rem auto;
+    padding: 0.5rem;
+    width: 80%;
+}
+
+.login button {
+    padding: 0.5rem 1rem;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+}

@@ -34,7 +34,7 @@ class ReportInDB(ReportBase):
     id: int
     user_id: int
     created_at: datetime
-    file_path: str
+    file_path: Optional[str]
 
     class Config:
         from_attributes = True

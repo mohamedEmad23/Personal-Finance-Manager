@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 
 from sqlalchemy.orm import Session
 from ..models import reportModel
@@ -17,7 +18,7 @@ from ..models.transactionModel import Transaction
 
 
 # Create Report
-def create_report(report: ReportCreate, user_id: int, file_path: str, file_format: str, db: Session):
+def create_report(report: ReportCreate, user_id: int, file_path: Optional[str], file_format: str, db: Session):
     # Set the default file path to the user's Downloads directory if not provided
     if not file_path:
         downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
@@ -36,7 +37,8 @@ def create_report(report: ReportCreate, user_id: int, file_path: str, file_forma
         end_date=report.end_date,
         title=report.title,
         description=report.description,
-        file_path=file_path,
+        file_path=file_path
+
     )
     db.add(db_report)
     db.commit()

@@ -153,7 +153,7 @@ const Dashboard = () => {
       break;
 
     case 'report':
-      createEndpoint = 'reports/';
+      createEndpoint = 'reports/reports/';
       newItem = {
         report_type: formData.report_type,
         format: formData.format,

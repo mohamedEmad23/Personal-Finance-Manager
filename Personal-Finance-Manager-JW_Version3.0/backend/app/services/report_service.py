@@ -1,32 +1,34 @@
 import os
 from typing import Optional
 
+import openpyxl
 from sqlalchemy.orm import Session
 from ..models import reportModel
-from ..schemas.reportSchema import ReportCreate
+from ..models.budgetModel import Budget
+from ..models.expenseModel import Expense
+from ..models.incomeModel import Income
+from ..schemas.reportSchema import ReportCreate, ReportType
 
 import matplotlib.pyplot as plt
 from sqlalchemy.orm import Session
 from datetime import datetime
-from ..models.transactionModel import Transaction
 
 import pandas as pd
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from sqlalchemy.orm import Session
-from ..models.transactionModel import Transaction
+from openpyxl.utils import get_column_letter
 
 
 # Create Report
 def create_report(report: ReportCreate, user_id: int, file_path: Optional[str], file_format: str, db: Session):
     # Set the default file path to the user's Downloads directory if not provided
-    if not file_path:
-        downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
-        file_name = f"transactions_{report.start_date.strftime('%Y%m%d')}_{report.end_date.strftime('%Y%m%d')}.{file_format}"
-        file_path = os.path.join(downloads_path, file_name)
+    downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
+    file_name = f"transactions_{report.start_date.strftime('%Y%m%d')}_{report.end_date.strftime('%Y%m%d')}.{file_format}"
+    file_path = os.path.join(downloads_path, file_name)
 
     # Generate the transactions file
-    generate_transactions_file(user_id, report.start_date.year, file_format, db)
+    generate_transactions_file(user_id, report, file_format, db)
 
     # Create the report entry in the database
     db_report = reportModel.Report(
@@ -83,21 +85,27 @@ def delete_report(report_id: int, db: Session):
 
 
 def plot_income_expense(user_id: int, start_date: datetime, end_date: datetime, db: Session):
-    transactions = db.query(Transaction).filter(
-        Transaction.user_id == user_id,
-        Transaction.date >= start_date,
-        Transaction.date <= end_date
+    # Query income transactions
+    incomes = db.query(Income).filter(
+        Income.user_id == user_id,
+        Income.created_at.between(start_date, end_date)
     ).all()
 
-    dates = [t.date for t in transactions]
-    amounts = [t.amount for t in transactions]
-    types = [t.type for t in transactions]
+    # Query expense transactions
+    expenses = db.query(Expense).filter(
+        Expense.user_id == user_id,
+        Expense.date.between(start_date, end_date)
+    ).all()
 
-    income_dates = [dates[i] for i in range(len(types)) if types[i] == 'income']
-    income_amounts = [amounts[i] for i in range(len(types)) if types[i] == 'income']
-    expense_dates = [dates[i] for i in range(len(types)) if types[i] == 'expense']
-    expense_amounts = [amounts[i] for i in range(len(types)) if types[i] == 'expense']
+    # Extract dates and amounts for incomes
+    income_dates = [income.created_at for income in incomes]
+    income_amounts = [income.amount for income in incomes]
 
+    # Extract dates and amounts for expenses
+    expense_dates = [expense.date for expense in expenses]
+    expense_amounts = [expense.amount for expense in expenses]
+
+    # Plotting the data
     plt.figure(figsize=(10, 5))
     plt.plot(income_dates, income_amounts, label='Income', color='green')
     plt.plot(expense_dates, expense_amounts, label='Expense', color='red')
@@ -106,37 +114,104 @@ def plot_income_expense(user_id: int, start_date: datetime, end_date: datetime, 
     plt.title('Income and Expense Over Time')
     plt.legend()
     plt.grid(True)
-    plt.savefig('income_expense_plot.png')
+    # Save the plot with a valid file path and format
+    plot_file_path = os.path.join(os.path.expanduser("~"), "Downloads", "income_expense_plot.png")
+    plt.savefig(plot_file_path, format='png')
     plt.close()
 
+    return plot_file_path
 
-def generate_transactions_file(user_id: int, year: int, file_format: str, db: Session):
-    transactions = db.query(Transaction).filter(
-        Transaction.user_id == user_id,
-        Transaction.date.between(f'{year}-01-01', f'{year}-12-31')
-    ).all()
 
-    data = [{
-        'Date': t.date,
-        'Type': t.type,
-        'Amount': t.amount,
-        'Description': t.description
-    } for t in transactions]
+def generate_transactions_file(user_id: int, report: ReportCreate, file_format: str, db: Session):
+    data = []
+    start_datetime = datetime.combine(report.start_date, datetime.min.time())
+    end_datetime = datetime.combine(report.end_date, datetime.max.time())
+
+    if report.report_type == ReportType.EXPENSE:
+        transactions = db.query(Expense).filter(
+            Expense.user_id == user_id,
+            Expense.date.between(start_datetime, end_datetime)
+        ).all()
+        data = [{
+            'Date': t.date,
+            'Type': 'expense',
+            'Amount': t.amount,
+            'Description': t.description,
+            'Category': t.category
+        } for t in transactions]
+    elif report.report_type == ReportType.INCOME:
+        transactions = db.query(Income).filter(
+            Income.user_id == user_id,
+            Income.created_at.between(start_datetime, end_datetime)
+        ).all()
+        data = [{
+            'Date': t.created_at,
+            'Type': 'income',
+            'Amount': t.amount,
+            'Description': t.description,
+            'Source': t.source,
+            'Frequency': t.frequency
+        } for t in transactions]
+    elif report.report_type == ReportType.BUDGET:
+        transactions = db.query(Budget).filter(
+            Budget.user_id == user_id,
+            Budget.start_date.between(start_datetime, end_datetime)
+        ).all()
+        data = [{
+            'Start Date': t.start_date,
+            'End Date': t.end_date,
+            'Type': 'budget',
+            'Amount': t.amount,
+            'Category': t.category,
+            'Current Usage': t.current_usage
+        } for t in transactions]
+    elif report.report_type == ReportType.SUMMARY:
+        expenses = db.query(Expense).filter(
+            Expense.user_id == user_id,
+            Expense.date.between(start_datetime, end_datetime)
+        ).all()
+        incomes = db.query(Income).filter(
+            Income.user_id == user_id,
+            Income.created_at.between(start_datetime, end_datetime)
+        ).all()
+        data = [{
+            'Date': t.date,
+            'Type': 'expense',
+            'Amount': t.amount,
+            'Description': t.description,
+            'Category': t.category
+        } for t in expenses] + [{
+            'Date': t.created_at,
+            'Type': 'income',
+            'Amount': t.amount,
+            'Description': t.description,
+            'Source': t.source,
+            'Frequency': t.frequency
+        } for t in incomes]
+        total_expense = sum(t.amount for t in expenses)
+        total_income = sum(t.amount for t in incomes)
+        data.append({'Total Expense': total_expense, 'Total Income': total_income})
 
     if file_format == 'csv':
         df = pd.DataFrame(data)
-        df.to_csv(f'transactions_{year}.csv', index=False)
+        df.to_csv(f'{report.title}.csv', index=False)
     elif file_format == 'excel':
         df = pd.DataFrame(data)
-        df.to_excel(f'transactions_{year}.xlsx', index=False)
+        with pd.ExcelWriter(f'{report.title}.xlsx', engine='openpyxl') as writer:
+            df.to_excel(writer, index=False)
+            workbook = writer.book
+            worksheet = writer.sheets['Sheet1']
+            for col in df.select_dtypes(include=['datetime']).columns:
+                col_idx = df.columns.get_loc(col) + 1
+                worksheet.column_dimensions[
+                    openpyxl.utils.get_column_letter(col_idx)].number_format = 'YYYY-MM-DD HH:MM:SS'
     elif file_format == 'pdf':
-        c = canvas.Canvas(f'transactions_{year}.pdf', pagesize=letter)
+        c = canvas.Canvas(f'{report.title}.pdf', pagesize=letter)
         width, height = letter
-        c.drawString(30, height - 30, f'Transactions for {year}')
+        c.drawString(30, height - 30, f'{report.title}')
         y = height - 50
         for transaction in data:
-            c.drawString(30, y,
-                         f"{transaction['Date']} - {transaction['Type']} - {transaction['Amount']} - {transaction['Description']}")
+            c.drawString(30, y, str(transaction))
             y -= 15
             if y < 30:
                 c.showPage()

@@ -1,13 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException
+from pydantic import BaseModel, EmailStr
 from sqlalchemy.orm import Session
 from starlette import status
 
 from ..models.budgetModel import Budget
 from ..schemas.budgetSchema import BudgetCreate, BudgetUpdate
-from ..services.budget_service import create_budget, get_user_budgets, update_budget, delete_budget, update_budget_usage
+from ..services.budget_service import create_budget, get_user_budgets, update_budget, delete_budget, \
+    update_budget_usage, send_email, notify_user
 from ..core.database import get_db
 
 budget_router = APIRouter()
+
+
+class EmailRequest(BaseModel):
+    to_email: EmailStr
+    subject: str
+    body: str
 
 
 @budget_router.post("/budgets/", status_code=status.HTTP_201_CREATED)
@@ -49,3 +57,12 @@ async def get_budget(budget_id: int, db: Session = Depends(get_db)):
     if not db_budget:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Budget not found")
     return db_budget
+
+
+@budget_router.post("/send-email/", status_code=200)
+async def send_email_endpoint(email_request: EmailRequest, db: Session = Depends(get_db)):
+    try:
+        send_email(email_request.to_email, email_request.subject, email_request.body)
+        return {"message": "Email sent successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

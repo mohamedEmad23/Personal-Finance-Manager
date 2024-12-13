@@ -14,7 +14,7 @@ class IncomeFrequency(str, Enum):
 
 class IncomeBase(BaseModel):
     amount: condecimal(max_digits=10, decimal_places=2)
-    description: str
+    description: Optional[str] = None
     frequency: IncomeFrequency
     source: str
 

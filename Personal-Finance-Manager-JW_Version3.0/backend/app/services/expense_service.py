@@ -1,18 +1,31 @@
 from sqlalchemy.orm import Session
 from datetime import datetime
-from decimal import Decimal
+from decimal import Decimal, InvalidOperation
 from starlette import status
 from starlette.exceptions import HTTPException
 
 from ..models import expenseModel
 from ..models.budgetModel import Budget
 from ..models.expenseModel import Expense
+from ..models.incomeModel import Income
 from ..schemas.expenseSchema import ExpenseCreate, ExpenseUpdate, ExpenseCategory
 from typing import Optional
 from ..services.budget_service import update_budget_usage, is_budget_valid
 
 
+def validate_amount(amount: Decimal):
+    try:
+        if amount < 0:
+            raise ValueError("Amount must be greater than or equal to 0.")
+        if amount.as_tuple().exponent < -2 or len(amount.as_tuple().digits) > 10:
+            raise ValueError("Amount must have up to 10 digits in total and up to 2 decimal places.")
+    except InvalidOperation:
+        raise ValueError("Invalid amount format.")
+
+
 def add_expense(expense: ExpenseCreate, user_id: int, db: Session):
+    validate_amount(expense.amount)
+
     expense_date = datetime.now()
     db_expense = expenseModel.Expense(
         user_id=user_id,
@@ -24,6 +37,13 @@ def add_expense(expense: ExpenseCreate, user_id: int, db: Session):
     db.add(db_expense)
     db.commit()
     db.refresh(db_expense)
+
+    # Subtract expense amount from total income
+    total_income = db.query(Income).filter(Income.user_id == user_id).first()
+    if total_income:
+        total_income.amount -= Decimal(expense.amount)
+        db.commit()
+        db.refresh(total_income)
 
     if is_budget_valid(user_id, expense.category, db):
         budget = db.query(Budget).filter(
@@ -49,6 +69,8 @@ def get_expense_by_id(expense_id: int, db: Session):
 
 
 def update_expense(expense_id: int, expense: ExpenseUpdate, db: Session):
+    validate_amount(expense.amount)
+
     db_expense = db.query(expenseModel.Expense).filter(expenseModel.Expense.id == expense_id).first()
     if db_expense:
         old_amount = db_expense.amount
@@ -59,6 +81,13 @@ def update_expense(expense_id: int, expense: ExpenseUpdate, db: Session):
         db_expense.date = expense.date or db_expense.date
         db.commit()
         db.refresh(db_expense)
+
+        # Adjust total income
+        total_income = db.query(Income).filter(Income.user_id == db_expense.user_id).first()
+        if total_income:
+            total_income.amount += Decimal(old_amount) - Decimal(db_expense.amount)
+            db.commit()
+            db.refresh(total_income)
 
         update_budget_usage(db_expense.user_id, db_expense.category, db, old_amount, expense.amount, expense_date)
 
@@ -76,6 +105,13 @@ def delete_expense(expense_id: int, db: Session):
 
         db.delete(db_expense)
         db.commit()
+
+        # Add expense amount back to total income
+        total_income = db.query(Income).filter(Income.user_id == user_id).first()
+        if total_income:
+            total_income.amount += Decimal(expense_amount)
+            db.commit()
+            db.refresh(total_income)
 
         # Update the budget usage by adding the deleted expense amount back
         budget = db.query(Budget).filter(

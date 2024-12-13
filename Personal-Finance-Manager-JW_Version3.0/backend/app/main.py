@@ -1,4 +1,10 @@
+import os
+from dotenv import load_dotenv
+
+
 from fastapi import FastAPI, Depends, HTTPException
+
+from .api.notifications import notification_router
 from .api.users import router as users_router
 from .api.budgets import budget_router
 from .api.reports import report_router
@@ -30,7 +36,7 @@ app.include_router(expense_router, prefix="/api/v1/expenses", tags=["expenses"])
 app.include_router(income_router, prefix="/api/v1/income", tags=["income"])
 app.include_router(budget_router, prefix="/api/v1/budgets", tags=["budgets"])
 app.include_router(report_router, prefix="/api/v1/reports", tags=["reports"])
-
+app.include_router(notification_router, prefix="/api/v1/notifications", tags=["notifications"])
 
 @app.get("/")
 async def root():
@@ -41,3 +47,11 @@ async def root():
 async def say_hello(name: str):
     return {"message": f"Hello {name}"}
 
+# Load environment variables from the .env file
+load_dotenv()
+
+# Get the SMTP_PORT from the environment variables
+smtp_port = os.getenv("SMTP_PORT")
+
+# Print the SMTP_PORT to the console
+print(f"SMTP Port: {smtp_port}")

@@ -15,4 +15,8 @@ class User(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
-    transactions = relationship("Transaction", back_populates="user")
+    budgets = relationship("Budget", back_populates="user")
+    expenses = relationship("Expense", back_populates="user")
+    incomes = relationship("Income", back_populates="user")
+    reports = relationship("Report", back_populates="user")
+    notifications = relationship("Notification", back_populates="user")

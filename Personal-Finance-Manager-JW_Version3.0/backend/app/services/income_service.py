@@ -1,14 +1,28 @@
 # income_service.py
+from decimal import Decimal, InvalidOperation
+
 from sqlalchemy.orm import Session
 from datetime import datetime
 from sqlalchemy.sql import func
 from ..models import incomeModel
+from ..models.incomeModel import Income
 from ..schemas.incomeSchema import IncomeCreate, IncomeUpdate, IncomeFrequency
 from typing import Optional
 
 
+def validate_amount(amount: Decimal):
+    try:
+        if amount < 0:
+            raise ValueError("Amount must be greater than or equal to 0.")
+        if amount.as_tuple().exponent < -2 or len(amount.as_tuple().digits) > 10:
+            raise ValueError("Amount must have up to 10 digits in total and up to 2 decimal places.")
+    except InvalidOperation:
+        raise ValueError("Invalid amount format.")
+
+
 # Add Income
 def add_income(income: IncomeCreate, user_id: int, db: Session):
+    validate_amount(income.amount)
     db_income = incomeModel.Income(
         user_id=user_id,
         amount=income.amount,
@@ -37,12 +51,21 @@ def get_income_by_id(income_id: int, db: Session):
 def update_income(income_id: int, income: IncomeUpdate, db: Session):
     db_income = db.query(incomeModel.Income).filter(incomeModel.Income.id == income_id).first()
     if db_income:
+        old_amount = db_income.amount
         db_income.amount = income.amount
         db_income.description = income.description
         db_income.frequency = income.frequency
         db_income.source = income.source
         db.commit()
         db.refresh(db_income)
+
+        # Adjust total income
+        total_income = db.query(Income).filter(Income.user_id == db_income.user_id).first()
+        if total_income:
+            total_income.amount += Decimal(income.amount) - Decimal(old_amount)
+            db.commit()
+            db.refresh(total_income)
+
         return db_income
     return None
 

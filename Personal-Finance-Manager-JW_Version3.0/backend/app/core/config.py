@@ -7,7 +7,7 @@ import re
 
 class Settings(BaseSettings):
     # API Settings
-    API_V1_STR: str = "/api"
+    API_V1_STR: str = "/api/v1"
     PROJECT_NAME: str = "Personal Finance Manager"
 
     # Security
@@ -39,7 +39,7 @@ class Settings(BaseSettings):
             r"mysql://(?P<user>[^:]+):(?P<password>[^@]+)@(?P<host>[^:/]+)(?::(?P<port>\d+))?/(?P<database>[^?]+)"
         )
         if not pattern.match(v):
-            raise ValidationError("Invalid MYSQL_URI format")
+            raise ValueError("Invalid MYSQL_URI format")
         return v
 
     class Config:

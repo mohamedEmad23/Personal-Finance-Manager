@@ -19,7 +19,8 @@ class NotificationBase(BaseModel):
 
 
 class NotificationCreate(NotificationBase):
-    pass
+    title: str
+    message: str
 
 
 class NotificationUpdate(BaseModel):

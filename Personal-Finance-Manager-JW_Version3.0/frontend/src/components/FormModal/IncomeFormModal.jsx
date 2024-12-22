@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import './FormModal.css';
 
+const frequencies = ['once', 'daily', 'weekly', 'monthly', 'yearly'];
+
 const IncomeFormModal = ({ initialData = {}, onSubmit, onClose, isEditMode = false }) => {
   const [formData, setFormData] = useState({
     amount: initialData.amount || '',
     description: initialData.description || '',
     frequency: initialData.frequency || '',
-    source: initialData.source || '',
+    source: initialData.source || ''
   });
 
   useEffect(() => {
@@ -14,7 +16,7 @@ const IncomeFormModal = ({ initialData = {}, onSubmit, onClose, isEditMode = fal
       amount: initialData.amount || '',
       description: initialData.description || '',
       frequency: initialData.frequency || '',
-      source: initialData.source || '',
+      source: initialData.source || ''
     });
   }, [initialData]);
 
@@ -44,26 +46,6 @@ const IncomeFormModal = ({ initialData = {}, onSubmit, onClose, isEditMode = fal
             />
           </label>
           <label>
-            Description:
-            <input
-              type="text"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              required
-            />
-          </label>
-          <label>
-            Frequency:
-            <input
-              type="text"
-              name="frequency"
-              value={formData.frequency}
-              onChange={handleChange}
-              required
-            />
-          </label>
-          <label>
             Source:
             <input
               type="text"
@@ -73,9 +55,31 @@ const IncomeFormModal = ({ initialData = {}, onSubmit, onClose, isEditMode = fal
               required
             />
           </label>
+          <label>
+            Frequency:
+            <select name="frequency" value={formData.frequency} onChange={handleChange} required>
+              <option value="" disabled>Select frequency</option>
+              {frequencies.map((freq) => (
+                <option key={freq} value={freq}>{freq}</option>
+              ))}
+            </select>
+          </label>
+          <label>
+            Description:
+            <input
+              type="text"
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+            />
+          </label>
           <div className="form-buttons">
-            <button className='submit-button' type="submit">{isEditMode ? 'Update' : 'Create'}</button>
-            <button type="button" className="cancel-button" onClick={onClose}>Cancel</button>
+            <button className="submit-button" type="submit">
+              {isEditMode ? 'Update' : 'Create'}
+            </button>
+            <button type="button" className="cancel-button" onClick={onClose}>
+              Cancel
+            </button>
           </div>
         </form>
       </div>

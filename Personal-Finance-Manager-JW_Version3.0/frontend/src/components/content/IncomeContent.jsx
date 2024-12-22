@@ -1,7 +1,17 @@
 import React from 'react';
 import IncomeFormModal from '../FormModal/IncomeFormModal';
 
-const IncomeContent = ({ incomes, menuVisible, toggleMenu, deleteItem, setEditingItem, setModalOpen, editingItem, handleUpdateItem, handleCreateItem }) => {
+const IncomeContent = ({ 
+incomes, 
+menuVisible, 
+toggleMenu, 
+deleteItem, 
+setEditingItem,
+setModalOpen,
+editingItem,
+handleUpdateItem,
+handleCreateItem,
+isModalOpen }) => {
   return (
     <div className="budget-content">
       <div className="budget-header">
@@ -43,7 +53,7 @@ const IncomeContent = ({ incomes, menuVisible, toggleMenu, deleteItem, setEditin
           ))
         )}
       </div>
-      {editingItem !== null && (
+      {isModalOpen && (
         <IncomeFormModal
           initialData={editingItem ? {
             amount: editingItem.amount,
@@ -57,8 +67,12 @@ const IncomeContent = ({ incomes, menuVisible, toggleMenu, deleteItem, setEditin
             } else {
               handleCreateItem(formData, 'income');
             }
+            setModalOpen(false);
           }}
-          onClose={() => { setModalOpen(false); setEditingItem(null); }}
+          onClose={() => { 
+            setModalOpen(false); 
+            setEditingItem(null); 
+          }}
           isEditMode={!!editingItem}
         />
       )}

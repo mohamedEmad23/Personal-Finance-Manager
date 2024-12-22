@@ -1,31 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import './FormModal.css';
 
-const IncomeFormModal = ({ initialData, onSubmit, onClose, isEditMode }) => {
+const IncomeFormModal = ({ initialData = {}, onSubmit, onClose, isEditMode = false }) => {
   const [formData, setFormData] = useState({
-    amount: '',
-    description: '',
-    frequency: 'once',
-    source: '',
+    amount: initialData.amount || '',
+    description: initialData.description || '',
+    frequency: initialData.frequency || '',
+    source: initialData.source || '',
   });
 
   useEffect(() => {
-    if (isEditMode && initialData) {
-      setFormData({
-        amount: initialData.amount || '',
-        description: initialData.description || '',
-        frequency: initialData.frequency || 'once',
-        source: initialData.source || '',
-      });
-    }
-  }, [isEditMode, initialData]);
+    setFormData({
+      amount: initialData.amount || '',
+      description: initialData.description || '',
+      frequency: initialData.frequency || '',
+      source: initialData.source || '',
+    });
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = (e) => {
@@ -60,18 +55,13 @@ const IncomeFormModal = ({ initialData, onSubmit, onClose, isEditMode }) => {
           </label>
           <label>
             Frequency:
-            <select
+            <input
+              type="text"
               name="frequency"
               value={formData.frequency}
               onChange={handleChange}
               required
-            >
-              <option value="once">Once</option>
-              <option value="daily">Daily</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-            </select>
+            />
           </label>
           <label>
             Source:
@@ -83,11 +73,9 @@ const IncomeFormModal = ({ initialData, onSubmit, onClose, isEditMode }) => {
               required
             />
           </label>
-          <div className="modal-actions">
+          <div className="form-buttons">
             <button className='submit-button' type="submit">{isEditMode ? 'Update' : 'Create'}</button>
-            <button className='cancel-button' type="button" onClick={onClose}>
-              Cancel
-            </button>
+            <button type="button" className="cancel-button" onClick={onClose}>Cancel</button>
           </div>
         </form>
       </div>

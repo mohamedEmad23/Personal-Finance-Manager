@@ -3,31 +3,26 @@ import './FormModal.css';
 
 const categories = ['food', 'transport', 'utilities', 'entertainment', 'shopping', 'health', 'other'];
 
-const ExpenseFormModal = ({ initialData, onSubmit, onClose, isEditMode }) => {
+const ExpenseFormModal = ({ initialData = {}, onSubmit, onClose, isEditMode = false }) => {
   const [formData, setFormData] = useState({
-    amount: '',
-    description: '',
-    frequency: 'once',
-    source: '',
+    amount: initialData.amount || '',
+    category: initialData.category || '',
+    description: initialData.description || '',
+    date: initialData.date || '',
   });
 
   useEffect(() => {
-    if (isEditMode && initialData) {
-      setFormData({
-        amount: initialData.amount || '',
-        description: initialData.description || '',
-        category: initialData.category || '',
-        date_recorded: initialData.Date || ''
-      });
-    }
-  }, [isEditMode, initialData]);
+    setFormData({
+      amount: initialData.amount || '',
+      category: initialData.category || '',
+      description: initialData.description || '',
+      date: initialData.date || '',
+    });
+  }, [initialData]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({
-      ...prevData,
-      [name]: value,
-    }));
+    setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = (e) => {
@@ -38,21 +33,8 @@ const ExpenseFormModal = ({ initialData, onSubmit, onClose, isEditMode }) => {
   return (
     <div className="income-modal">
       <div className="modal-content">
-        <h2>{isEditMode ? 'Edit Expense' : 'Add Expense'}</h2>
+        <h2>{isEditMode ? 'Edit Expense' : 'Create Expense'}</h2>
         <form onSubmit={handleSubmit}>
-          <label>
-                Category:
-                <select name="category" value={formData.category || ''} onChange={handleChange} required>
-                  <option value="" disabled>
-                    Select a category
-                  </option>
-                  {categories.map((category) => (
-                    <option key={category} value={category}>
-                      {category}
-                    </option>
-                  ))}
-                </select>
-          </label>
           <label>
             Amount:
             <input
@@ -62,6 +44,15 @@ const ExpenseFormModal = ({ initialData, onSubmit, onClose, isEditMode }) => {
               onChange={handleChange}
               required
             />
+          </label>
+          <label>
+            Category:
+            <select name="category" value={formData.category} onChange={handleChange} required>
+              <option value="" disabled>Select a category</option>
+              {categories.map((category) => (
+                <option key={category} value={category}>{category}</option>
+              ))}
+            </select>
           </label>
           <label>
             Description:
@@ -74,20 +65,18 @@ const ExpenseFormModal = ({ initialData, onSubmit, onClose, isEditMode }) => {
             />
           </label>
           <label>
-            Date recorded:
+            Date:
             <input
               type="date"
-              name="start_date"
-              value={formData.start_date || new Date().toISOString().split('T')[0]}
+              name="date"
+              value={formData.date || new Date().toISOString().split('T')[0]}
               onChange={handleChange}
               required
             />
           </label>
-          <div className="modal-actions">
+          <div className="form-buttons">
             <button className='submit-button' type="submit">{isEditMode ? 'Update' : 'Create'}</button>
-            <button className='cancel-button' type="button" onClick={onClose}>
-              Cancel
-            </button>
+            <button type="button" className="cancel-button" onClick={onClose}>Cancel</button>
           </div>
         </form>
       </div>

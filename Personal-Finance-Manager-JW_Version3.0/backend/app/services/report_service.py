@@ -7,7 +7,7 @@ from ..models import reportModel
 from ..models.budgetModel import Budget
 from ..models.expenseModel import Expense
 from ..models.incomeModel import Income
-from ..schemas.reportSchema import ReportCreate, ReportType
+from ..schemas.reportSchema import ReportCreate, ReportType, ReportFormat
 
 import matplotlib.pyplot as plt
 from sqlalchemy.orm import Session
@@ -21,7 +21,7 @@ from openpyxl.utils import get_column_letter
 
 
 # Create Report
-def create_report(report: ReportCreate, user_id: int, file_path: Optional[str], file_format: str, db: Session):
+def create_report(report: ReportCreate, user_id: int, file_path: Optional[str], file_format: ReportFormat, db: Session):
     # Set the default file path to the user's Downloads directory if not provided
     downloads_path = os.path.join(os.path.expanduser("~"), "Downloads")
     file_name = f"transactions_{report.start_date.strftime('%Y%m%d')}_{report.end_date.strftime('%Y%m%d')}.{file_format}"

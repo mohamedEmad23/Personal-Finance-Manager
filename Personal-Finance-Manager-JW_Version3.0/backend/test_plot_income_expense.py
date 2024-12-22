@@ -1,7 +1,7 @@
 import requests
 
 # Define the API endpoint
-url = "http://localhost:8000/api/v1/reports/reports/plot_income_expense/"
+url = "http://localhost:8000/api/v1/reports/plot_income_expense/"
 
 # Define the request payload
 params = {

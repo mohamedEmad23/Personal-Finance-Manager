@@ -13,7 +13,9 @@ income_router = APIRouter()
 
 @income_router.post("/incomes/", status_code=status.HTTP_201_CREATED)
 async def create_income(income: IncomeCreate, user_id: int, db: Session = Depends(get_db)):
-    return add_income(income, user_id, db)
+    new_income = add_income(income, user_id, db)
+    total_income = db.query(func.sum(Income.amount)).filter(Income.user_id == user_id).scalar()
+    return {"new_income": new_income, "total_income": total_income or 0}
 
 
 @income_router.put("/incomes/{income_id}/")
@@ -25,10 +27,12 @@ async def update_income_route(income_id: int, income: IncomeUpdate, db: Session 
 
 
 @income_router.delete("/incomes/{income_id}/", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_income_route(income_id: int, db: Session = Depends(get_db)):
+async def delete_income_route(income_id: int, user_id: int, db: Session = Depends(get_db)):
     db_income = delete_income(income_id, db)
     if not db_income:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Income not found")
+    total_income = db.query(func.sum(Income.amount)).filter(Income.user_id == user_id).scalar()
+    return {"total_income": total_income or 0}
 
 
 @income_router.get("/incomes/search/")
@@ -45,3 +49,10 @@ async def get_all_incomes(user_id: int, db: Session = Depends(get_db)):
     if not incomes:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No budgets found for the user")
     return incomes
+
+
+# income.py
+@income_router.get("/incomes/total")
+async def get_total_income(user_id: int, db: Session = Depends(get_db)):
+    total_income = db.query(func.sum(Income.amount)).filter(Income.user_id == user_id).scalar()
+    return {"total_income": total_income or 0}

@@ -19,6 +19,8 @@ both (income/expenses). Also delete the transactionModel and schema.
 
 9. Also, define a function for total income creation logic in expenses
 
+10. For Report, check the request in the network when testing the create report. because no payload is being sent.
+
 ______Fixes and Updates in frontend:
 
 1. Dashboard for report to test buttons and more importantly plotting transactions/generate report
@@ -54,3 +56,77 @@ async def notify_user_endpoint(budget_id: int, db: Session = Depends(get_db)):
         return {"message": "User notified successfully"}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+
+----------------------------------
+[
+    {"amount": 5000, "created_at": "2023-01-01T00:00:00", "source": "Salary", "frequency": "monthly"},
+    {"amount": 200, "created_at": "2023-01-05T00:00:00", "source": "Freelance", "frequency": "one-time"},
+    {"amount": 150, "created_at": "2023-01-10T00:00:00", "source": "Gift", "frequency": "one-time"},
+    {"amount": 300, "created_at": "2023-01-15T00:00:00", "source": "Investment", "frequency": "quarterly"},
+    {"amount": 5000, "created_at": "2023-02-01T00:00:00", "source": "Salary", "frequency": "monthly"},
+    {"amount": 250, "created_at": "2023-02-05T00:00:00", "source": "Freelance", "frequency": "one-time"},
+    {"amount": 100, "created_at": "2023-02-10T00:00:00", "source": "Gift", "frequency": "one-time"},
+    {"amount": 350, "created_at": "2023-02-15T00:00:00", "source": "Investment", "frequency": "quarterly"},
+    {"amount": 5000, "created_at": "2023-03-01T00:00:00", "source": "Salary", "frequency": "monthly"},
+    {"amount": 300, "created_at": "2023-03-05T00:00:00", "source": "Freelance", "frequency": "one-time"},
+    {"amount": 200, "created_at": "2023-03-10T00:00:00", "source": "Gift", "frequency": "one-time"},
+    {"amount": 400, "created_at": "2023-03-15T00:00:00", "source": "Investment", "frequency": "quarterly"},
+    {"amount": 5000, "created_at": "2023-04-01T00:00:00", "source": "Salary", "frequency": "monthly"},
+    {"amount": 350, "created_at": "2023-04-05T00:00:00", "source": "Freelance", "frequency": "one-time"},
+    {"amount": 250, "created_at": "2023-04-10T00:00:00", "source": "Gift", "frequency": "one-time"},
+    {"amount": 450, "created_at": "2023-04-15T00:00:00", "source": "Investment", "frequency": "quarterly"},
+    {"amount": 5000, "created_at": "2023-05-01T00:00:00", "source": "Salary", "frequency": "monthly"},
+    {"amount": 400, "created_at": "2023-05-05T00:00:00", "source": "Freelance", "frequency": "one-time"},
+    {"amount": 300, "created_at": "2023-05-10T00:00:00", "source": "Gift", "frequency": "one-time"},
+    {"amount": 500, "created_at": "2023-05-15T00:00:00", "source": "Investment", "frequency": "quarterly"}
+]
+
+__________________________
+
+[
+    {"amount": 100, "created_at": "2023-01-02T00:00:00", "category": "Food", "description": "Groceries"},
+    {"amount": 50, "created_at": "2023-01-03T00:00:00", "category": "Transport", "description": "Bus fare"},
+    {"amount": 200, "created_at": "2023-01-04T00:00:00", "category": "Entertainment", "description": "Movies"},
+    {"amount": 150, "created_at": "2023-01-06T00:00:00", "category": "Utilities", "description": "Electricity bill"},
+    {"amount": 100, "created_at": "2023-01-07T00:00:00", "category": "Food", "description": "Dining out"},
+    {"amount": 75, "created_at": "2023-01-08T00:00:00", "category": "Transport", "description": "Taxi fare"},
+    {"amount": 300, "created_at": "2023-01-09T00:00:00", "category": "Entertainment", "description": "Concert tickets"},
+    {"amount": 200, "created_at": "2023-01-11T00:00:00", "category": "Utilities", "description": "Water bill"},
+    {"amount": 100, "created_at": "2023-01-12T00:00:00", "category": "Food", "description": "Groceries"},
+    {"amount": 50, "created_at": "2023-01-13T00:00:00", "category": "Transport", "description": "Bus fare"},
+    {"amount": 200, "created_at": "2023-01-14T00:00:00", "category": "Entertainment", "description": "Movies"},
+    {"amount": 150, "created_at": "2023-01-16T00:00:00", "category": "Utilities", "description": "Electricity bill"},
+    {"amount": 100, "created_at": "2023-01-17T00:00:00", "category": "Food", "description": "Dining out"},
+    {"amount": 75, "created_at": "2023-01-18T00:00:00", "category": "Transport", "description": "Taxi fare"},
+    {"amount": 300, "created_at": "2023-01-19T00:00:00", "category": "Entertainment", "description": "Concert tickets"},
+    {"amount": 200, "created_at": "2023-01-20T00:00:00", "category": "Utilities", "description": "Water bill"},
+    {"amount": 100, "created_at": "2023-01-21T00:00:00", "category": "Food", "description": "Groceries"},
+    {"amount": 50, "created_at": "2023-01-22T00:00:00", "category": "Transport", "description": "Bus fare"},
+    {"amount": 200, "created_at": "2023-01-23T00:00:00", "category": "Entertainment", "description": "Movies"},
+    {"amount": 150, "created_at": "2023-01-24T00:00:00", "category": "Utilities", "description": "Electricity bill"}
+]
+
+____________________________
+
+[
+    {"start_date": "2023-01-01T00:00:00", "end_date": "2023-01-31T00:00:00", "amount": 1000, "category": "Food", "current_usage": 500},
+    {"start_date": "2023-01-01T00:00:00", "end_date": "2023-01-31T00:00:00", "amount": 300, "category": "Transport", "current_usage": 150},
+    {"start_date": "2023-01-01T00:00:00", "end_date": "2023-01-31T00:00:00", "amount": 500, "category": "Entertainment", "current_usage": 250},
+    {"start_date": "2023-01-01T00:00:00", "end_date": "2023-01-31T00:00:00", "amount": 400, "category": "Utilities", "current_usage": 200},
+    {"start_date": "2023-02-01T00:00:00", "end_date": "2023-02-28T00:00:00", "amount": 1000, "category": "Food", "current_usage": 600},
+    {"start_date": "2023-02-01T00:00:00", "end_date": "2023-02-28T00:00:00", "amount": 300, "category": "Transport", "current_usage": 180},
+    {"start_date": "2023-02-01T00:00:00", "end_date": "2023-02-28T00:00:00", "amount": 500, "category": "Entertainment", "current_usage": 300},
+    {"start_date": "2023-02-01T00:00:00", "end_date": "2023-02-28T00:00:00", "amount": 400, "category": "Utilities", "current_usage": 240},
+    {"start_date": "2023-03-01T00:00:00", "end_date": "2023-03-31T00:00:00", "amount": 1000, "category": "Food", "current_usage": 700},
+    {"start_date": "2023-03-01T00:00:00", "end_date": "2023-03-31T00:00:00", "amount": 300, "category": "Transport", "current_usage": 210},
+    {"start_date": "2023-03-01T00:00:00", "end_date": "2023-03-31T00:00:00", "amount": 500, "category": "Entertainment", "current_usage": 350},
+    {"start_date": "2023-03-01T00:00:00", "end_date": "2023-03-31T00:00:00", "amount": 400, "category": "Utilities", "current_usage": 280},
+    {"start_date": "2023-04-01T00:00:00", "end_date": "2023-04-30T00:00:00", "amount": 1000, "category": "Food", "current_usage": 800},
+    {"start_date": "2023-04-01T00:00:00", "end_date": "2023-04-30T00:00:00", "amount": 300, "category": "Transport", "current_usage": 240},
+    {"start_date": "2023-04-01T00:00:00", "end_date": "2023-04-30T00:00:00", "amount": 500, "category": "Entertainment", "current_usage": 400},
+    {"start_date": "2023-04-01T00:00:00", "end_date": "2023-04-30T00:00:00", "amount": 400, "category": "Utilities", "current_usage": 320},
+    {"start_date": "2023-05-01T00:00:00", "end_date": "2023-05-31T00:00:00", "amount": 1000, "category": "Food", "current_usage": 900},
+    {"start_date": "2023-05-01T00:00:00", "end_date": "2023-05-31T00:00:00", "amount": 300, "category": "Transport", "current_usage": 270},
+    {"start_date": "2023-05-01T00:00:00", "end_date": "2023-05-31T00:00:00", "amount": 500, "category": "Entertainment", "current_usage": 450},
+    {"start_date": "2023-05-01T00:00:00", "end_date": "2023-05-31T00:00:00", "amount": 400, "category": "Utilities", "current_usage": 360}
+]

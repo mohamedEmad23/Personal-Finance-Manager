@@ -122,7 +122,7 @@ def delete_expense(expense_id: int, db: Session):
         ).first()
 
         if budget:
-            budget.current_usage = Decimal(budget.current_usage) + expense_amount
+            budget.current_usage = Decimal(budget.current_usage) - expense_amount
             db.commit()
             db.refresh(budget)
 

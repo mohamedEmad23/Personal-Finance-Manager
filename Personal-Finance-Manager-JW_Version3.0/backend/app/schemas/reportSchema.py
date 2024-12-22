@@ -27,7 +27,12 @@ class ReportBase(BaseModel):
 
 
 class ReportCreate(ReportBase):
-    pass
+    report_type: ReportType
+    start_date: datetime
+    end_date: datetime
+    title: Optional[str] = None
+    description: Optional[str] = None
+    format: ReportFormat
 
 
 class ReportInDB(ReportBase):
@@ -35,6 +40,7 @@ class ReportInDB(ReportBase):
     user_id: int
     created_at: datetime
     file_path: Optional[str]
+    format: ReportFormat
 
     class Config:
         from_attributes = True

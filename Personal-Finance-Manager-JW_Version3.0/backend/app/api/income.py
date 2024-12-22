@@ -45,3 +45,8 @@ async def get_all_incomes(user_id: int, db: Session = Depends(get_db)):
     if not incomes:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No budgets found for the user")
     return incomes
+
+@income_router.get("/incomes/total/", status_code=status.HTTP_200_OK)
+async def get_total_income(user_id: int, db: Session = Depends(get_db)):
+    total_income = get_total_income_service(user_id, db)
+    return {"total_income": total_income}

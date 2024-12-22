@@ -20,25 +20,49 @@ const Navbar = () => {
   const location = useLocation();
   const { userId } = location.state || {};
   const [userName, setUserName] = useState('');
+  const [totalIncome, setTotalIncome] = useState(0);
   const [loading, setLoading] = useState(true);
 
+  // Track reload to refetch data
+  const [reload, setReload] = useState(false);
+
   useEffect(() => {
-    if (userId) {
-      api.get(`users/users/${userId}`)
-        .then((response) => {
-          if (response.data.name) {
-            setUserName(response.data.name);
+    const fetchUserData = async () => {
+      try {
+        if (userId) {
+          // Fetch user data
+          const userResponse = await api.get(`users/users/${userId}`);
+          if (userResponse.data.name) {
+            setUserName(userResponse.data.name);
           } else {
             console.error('User not found');
           }
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error('Error fetching user data:', error);
-          setLoading(false);
-        });
-    }
-  }, [userId]);
+  
+          // Fetch total income
+          const incomeResponse = await api.get(`income/incomes/total/`, {
+            params: { user_id: userId },
+          });
+          console.log('Income API response:', incomeResponse.data); // Log to inspect
+          if (incomeResponse.data.total_income !== undefined) {
+            setTotalIncome(incomeResponse.data.total_income); // Use `total_income`
+          } else {
+            console.error('Total income not found in response:', incomeResponse.data);
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching user or income data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchUserData();
+  }, [userId, reload]);
+  
+
+  const refreshIncome = () => {
+    setReload(!reload); // Trigger refetch by toggling reload state
+  };
 
   return (
     <nav className="navbar">
@@ -49,13 +73,18 @@ const Navbar = () => {
         {loading ? (
           <h2>Loading user data...</h2>
         ) : (
-          <h2>Welcome to your Dashboard, {userName || "User not found"}!</h2>
+          <h2>
+            Welcome to your Dashboard, {userName || 'User not found'}! 
+            <br />
+            Total Income: ${totalIncome.toFixed(2)}
+          </h2>
         )}
       </div>
       <div className="profile">
         <FaUserCircle size={30} onClick={toggleDropdown} />
         {isDropdownOpen && (
           <div className="dropdown">
+            <button onClick={refreshIncome}>Refresh Income</button>
             <button onClick={handleLogout}>Logout</button>
           </div>
         )}

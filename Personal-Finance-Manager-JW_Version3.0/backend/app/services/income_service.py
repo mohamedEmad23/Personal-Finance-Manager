@@ -112,3 +112,8 @@ def search_incomes(
         query = query.filter(incomeModel.Income.user_id == user_id)
 
     return query.all()
+
+# Get Total Income for a User
+def get_total_income_service(user_id: int, db: Session):
+    total_income = db.query(func.sum(Income.amount)).filter(Income.user_id == user_id).scalar() or 0
+    return total_income

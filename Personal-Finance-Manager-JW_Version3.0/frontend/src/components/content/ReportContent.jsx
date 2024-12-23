@@ -1,5 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReportFormModal from '../FormModal/ReportFormModal';
+import SpendingAnalysis from '../analysis/SpendingAnalysis';
+import { analyzeSpending, plotIncomeExpense } from '../../services/reportService';
+import { toast } from 'react-toastify';
+import DatePicker from 'react-datepicker';
+import "react-datepicker/dist/react-datepicker.css";
 
 const ReportContent = ({
   reports,
@@ -11,8 +16,42 @@ const ReportContent = ({
   editingItem,
   handleUpdateItem,
   handleCreateItem,
-  isModalOpen
+  isModalOpen,
+  userId
 }) => {
+  const [analysisData, setAnalysisData] = useState(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isPlotting, setIsPlotting] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
+
+  const handleAnalyzeSpending = async () => {
+    try {
+      setIsAnalyzing(true);
+      const response = await analyzeSpending(userId);
+      setAnalysisData(response.data);
+      toast.success('Analysis completed successfully');
+    } catch (error) {
+      toast.error('Failed to analyze spending');
+      console.error('Analysis error:', error);
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
+
+  const handlePlotIncomeExpense = async () => {
+    try {
+      setIsPlotting(true);
+      await plotIncomeExpense(userId, startDate.toISOString(), endDate.toISOString());
+      toast.success('Plot generated successfully');
+    } catch (error) {
+      toast.error('Failed to generate plot');
+      console.error('Plot error:', error);
+    } finally {
+      setIsPlotting(false);
+    }
+  };
+
   return (
     <div className="budget-content">
       <div className="budget-header">
@@ -20,16 +59,55 @@ const ReportContent = ({
         <div className="budget-buttons">
           <button
             className="create-button"
-            onClick={(e) => {
-              e.stopPropagation();
+            onClick={() => {
               setEditingItem(null);
               setModalOpen(true);
             }}
           >
             Create Report
           </button>
+          <button
+            className="analyze-button"
+            onClick={handleAnalyzeSpending}
+            disabled={isAnalyzing}
+          >
+            {isAnalyzing ? 'Analyzing...' : 'Analyze Spending'}
+          </button>
+          <div className="plot-controls">
+            <DatePicker
+              selected={startDate}
+              onChange={date => setStartDate(date)}
+              selectsStart
+              startDate={startDate}
+              endDate={endDate}
+              className="date-picker"
+            />
+            <DatePicker
+              selected={endDate}
+              onChange={date => setEndDate(date)}
+              selectsEnd
+              startDate={startDate}
+              endDate={endDate}
+              minDate={startDate}
+              className="date-picker"
+            />
+            <button
+              className="plot-button"
+              onClick={handlePlotIncomeExpense}
+              disabled={isPlotting}
+            >
+              {isPlotting ? 'Plotting...' : 'Plot Income vs Expense'}
+            </button>
+          </div>
         </div>
       </div>
+
+      {analysisData && (
+        <div className="analysis-section">
+          <SpendingAnalysis data={analysisData} />
+        </div>
+      )}
+
       <div className="budget-cards">
         {reports.length === 0 ? (
           <p>No reports available.</p>
@@ -83,6 +161,7 @@ const ReportContent = ({
           ))
         )}
       </div>
+
       {isModalOpen && (
         <ReportFormModal
           initialData={editingItem ? {

@@ -295,6 +295,7 @@ const Dashboard = () => {
           handleUpdateItem={handleUpdateItem}
           handleCreateItem={handleCreateItem}
           isModalOpen={isModalOpen}
+          userId={userId}
         />;
       default:
         return <h3>Please select an option from the sidebar</h3>;

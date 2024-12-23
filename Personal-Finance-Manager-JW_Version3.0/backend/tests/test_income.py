@@ -7,7 +7,7 @@ from datetime import datetime
 from ..app.main import app
 from ..app.core.database import Base, get_db
 
-TEST_DATABASE_URL = "mysql://root:123Main_Connection123@localhost/finance_manager_sp"
+TEST_DATABASE_URL = "mysql://root:johnw126126@localhost/finance_manager_sp"
 
 engine = create_engine(TEST_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

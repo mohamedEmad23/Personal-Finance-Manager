@@ -24,19 +24,48 @@ const Dashboard = () => {
 
   useEffect(() => {
     if (userId) {
-      api.get(`/budgets/budgets/`, { params: { user_id: userId } })
-        .then((response) => setBudgets(response.data || []))
-        .catch((error) => console.error('Error fetching budgets:', error));
+      // Fetch budgets for the user
+      api
+        .get(`budgets/budgets/`, { params: { user_id: userId } })
+        .then((response) => {
+          if (response.data) {
+            setBudgets(response.data); // Store the fetched budgets
+          } else {
+            console.error('No budgets found');
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching budgets:', error);
+        });
 
-      api.get('/income/incomes', { params: { user_id: userId } })
-        .then((response) => setIncomes(response.data || []))
-        .catch((error) => console.error('Error fetching incomes:', error));
+      // Fetch incomes for the user
+      api
+        .get('income/income/incomes', { params: { user_id: userId } })
+        .then((response) => {
+          if (response.data) {
+            setIncomes(response.data); // Store the fetched incomes
+          } else {
+            console.error('No incomes found');
+          }
+        })
+        .catch((error) => {
+          console.error('Error fetching incomes:', error);
+        });
 
-      api.get('/expenses/expenses', { params: { user_id: userId } })
-        .then((response) => setExpenses(response.data || []))
-        .catch((error) => console.error('Error fetching expenses:', error));
-
-      api.get(`/reports/user/${userId}`)
+        api
+            .get('expenses/expenses', { params: { user_id: userId } })
+            .then((response) => {
+            if (response.data) {
+                setExpenses(response.data); // Store the fetched incomes
+            } else {
+                console.error('No expenses found');
+            }
+            })
+            .catch((error) => {
+            console.error('Error fetching expenses:', error);
+        });
+         // New Code Snippet !!!!!!!!!!!!
+         api.get('reports/user/' + userId)
         .then(response => setReports(response.data || []))
         .catch(error => console.error('Error fetching reports:', error));
     }

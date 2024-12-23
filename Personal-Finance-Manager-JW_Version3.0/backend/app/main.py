@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 
-
+from fastapi.staticfiles import StaticFiles
 from fastapi import FastAPI, Depends, HTTPException
 
 from .api.notifications import notification_router
@@ -19,6 +19,8 @@ app = FastAPI()
 # Create the database tables
 Base.metadata.create_all(bind=engine)
 
+# Mount static directory for plots
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 app.add_middleware(
     CORSMiddleware,

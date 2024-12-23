@@ -84,42 +84,46 @@ def delete_report(report_id: int, db: Session):
     return None
 
 
-def plot_income_expense(user_id: int, start_date: datetime, end_date: datetime, db: Session):
-    # Query income transactions
-    incomes = db.query(Income).filter(
-        Income.user_id == user_id,
-        Income.created_at.between(start_date, end_date)
-    ).all()
+def plot_income_expense(user_id: int, start_date: datetime, end_date: datetime, db: Session, filepath: str):
+    try:
+        # Query income transactions
+        incomes = db.query(Income).filter(
+            Income.user_id == user_id,
+            Income.created_at.between(start_date, end_date)
+        ).order_by(Income.created_at).all()
 
-    # Query expense transactions
-    expenses = db.query(Expense).filter(
-        Expense.user_id == user_id,
-        Expense.date.between(start_date, end_date)
-    ).all()
+        # Query expense transactions
+        expenses = db.query(Expense).filter(
+            Expense.user_id == user_id,
+            Expense.date.between(start_date, end_date)
+        ).order_by(Expense.date).all()
 
-    # Extract dates and amounts for incomes
-    income_dates = [income.created_at for income in incomes]
-    income_amounts = [income.amount for income in incomes]
+        # Extract dates and amounts
+        income_dates = [income.created_at for income in incomes]
+        income_amounts = [float(income.amount) for income in incomes]
+        expense_dates = [expense.date for expense in expenses]
+        expense_amounts = [float(expense.amount) for expense in expenses]
 
-    # Extract dates and amounts for expenses
-    expense_dates = [expense.date for expense in expenses]
-    expense_amounts = [expense.amount for expense in expenses]
+        # Create plot
+        plt.figure(figsize=(10, 5))
+        plt.plot(income_dates, income_amounts, label='Income', color='green', marker='o')
+        plt.plot(expense_dates, expense_amounts, label='Expense', color='red', marker='o')
+        plt.xlabel('Date')
+        plt.ylabel('Amount ($)')
+        plt.title('Income and Expense Over Time')
+        plt.legend()
+        plt.grid(True)
+        plt.xticks(rotation=45)
+        plt.tight_layout()
 
-    # Plotting the data
-    plt.figure(figsize=(10, 5))
-    plt.plot(income_dates, income_amounts, label='Income', color='green')
-    plt.plot(expense_dates, expense_amounts, label='Expense', color='red')
-    plt.xlabel('Date')
-    plt.ylabel('Amount')
-    plt.title('Income and Expense Over Time')
-    plt.legend()
-    plt.grid(True)
-    # Save the plot with a valid file path and format
-    plot_file_path = os.path.join(os.path.expanduser("~"), "Downloads", "income_expense_plot.png")
-    plt.savefig(plot_file_path, format='png')
-    plt.close()
+        # Save plot
+        plt.savefig(filepath, format='png', dpi=300, bbox_inches='tight')
+        plt.close()
 
-    return plot_file_path
+        return filepath
+    except Exception as e:
+        plt.close()
+        raise Exception(f"Error generating plot: {str(e)}")
 
 
 def generate_transactions_file(user_id: int, report: ReportCreate, file_format: str, db: Session):

@@ -1,5 +1,6 @@
 from datetime import datetime
-
+from fastapi.staticfiles import StaticFiles
+import os
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List, Optional
@@ -17,6 +18,10 @@ from ..services.report_service import (
 )
 
 report_router = APIRouter()
+
+# Create plots directory if it doesn't exist
+PLOTS_DIR = "static/plots"
+os.makedirs(PLOTS_DIR, exist_ok=True)
 
 
 # Create Report
@@ -103,9 +108,26 @@ async def delete_existing_report(report_id: int, db: Session = Depends(get_db)):
 
 
 @report_router.get("/plot_income_expense/")
-async def plot_income_expense_endpoint(user_id: int, start_date: datetime, end_date: datetime, db: Session = Depends(get_db)):
-    plot_income_expense(user_id, start_date, end_date, db)
-    return {"message": "Plot generated successfully"}
+async def plot_income_expense_endpoint(
+    user_id: int, 
+    start_date: datetime, 
+    end_date: datetime, 
+    db: Session = Depends(get_db)
+):
+    try:
+        # Generate unique filename
+        filename = f"income_expense_plot_{user_id}_{int(datetime.now().timestamp())}.png"
+        filepath = os.path.join(PLOTS_DIR, filename)
+        
+        # Generate and save plot
+        plot_income_expense(user_id, start_date, end_date, db, filepath)
+        
+        # Return plot URL
+        plot_url = f"/static/plots/{filename}"
+        return {"plot_url": plot_url, "message": "Plot generated successfully"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @report_router.get("/generate_transactions_file/")
